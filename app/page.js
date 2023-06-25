@@ -1,91 +1,118 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+'use client'
+
+import { createContext, useReducer, useMemo, useEffect, useRef } from 'react'
+import * as d3 from 'd3'
+import dynamic from 'next/dynamic';
 import styles from './page.module.css'
+import reducer from './reducer'
+import { useWindowSize } from 'react-use';
+import { getWeatherData } from './functions';
 
-const inter = Inter({ subsets: ['latin'] })
+import Temp from './components/Temp';
+import Precipitation from './components/Precipitation';
+import Wind from './components/Wind';
 
-export default function Home() {
+export const AppContext = createContext(null)
+
+// video 1
+// https://www.youtube.com/watch?v=9uEmNgHzPhQ
+// video 2 - 5:45
+// https://www.youtube.com/watch?v=hR8xtl_IbCw
+// https://github.com/muratkemaldar/using-react-hooks-with-d3/tree/02-curved-line-chart
+// video 3
+
+export default function App() {
+  const { width, height } = useWindowSize();
+  const initialState = {
+    brwsrHeight: height,
+    brwsrWidth: width,
+    leftMargin: 50,
+    bottomMargin: 50,
+    data: [0]
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const providerValue = useMemo(() => ({ state, dispatch }), [state, dispatch])
+
+  const circleRef = useRef()
+  const lineRef = useRef()
+
+  // getting data & setting state on top level
+  useEffect(() => {
+    async function getWindToday() {
+      const windByHour = []
+      const data = await getWeatherData()
+      const hours = data.forecast.forecastday[0].hour
+      for (let hour of hours) {
+        console.log(hour.time + ': ' + hour.wind_mph)
+        windByHour.push(hour.wind_mph)
+      }
+      return windByHour
+    }
+    getWindToday().then((res) => {
+      // console.log(res)
+      dispatch({ type: 'setData', value: res })
+    })
+  }, [])
+
+
+  // draw line graph
+  useEffect(() => {
+    const svg = d3.select(lineRef.current)
+    const xScale = d3.scaleLinear()
+      .domain([0, 23])
+      .range([0, 300])
+    const yScale = d3.scaleLinear()
+      .domain([0, 50])
+      .range([150, 0])
+
+    const xAxis = d3.axisBottom(xScale).ticks(8).tickFormat(index => index)
+    const yAxis = d3.axisRight(yScale).ticks(7)
+    svg.select('.x-axis')
+      .style('transform', `translateY(150px)`)
+      .call(xAxis)
+    svg.select('.y-axis')
+      .style('transform', `translateX(300px)`)
+      .call(yAxis)
+
+    const myLine = d3.line()
+      .x((value, index) => xScale(index))
+      .y(((value, index) => yScale(value)))
+      .curve(d3.curveCardinal)
+
+
+    svg.selectAll('.line')
+      .data([state.data])
+      .join('path')
+      .attr('class', 'line')
+      .attr('d', value => myLine(value))
+      .attr('fill', 'none')
+      .attr('stroke', 'blue')
+
+  }, [state.data])
+
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main>
+      <AppContext.Provider value={providerValue}>
+        <div className='homeScreen'>
+          <div className='homeSection highlights'>
+          </div>
+          <div className='homeSection temp'>
+            <Temp/>
+          </div>
+          <div className='homeSection precipitation'>
+            <Precipitation/>
+          </div>
+          <div className='homeSection wind'>
+            <svg ref={lineRef}>
+              <g className="x-axis" />
+              <g className="y-axis" />
+            </svg>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      </AppContext.Provider>
     </main>
   )
 }

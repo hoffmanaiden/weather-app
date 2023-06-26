@@ -43,7 +43,7 @@ export default function Temp() {
 
 
   return (
-    <div>
+    <>
       <div className='sectionIcon'>🌡️</div>
       <div className='graphContainer'>
         <svg ref={graphLineRef}>
@@ -52,6 +52,6 @@ export default function Temp() {
         </svg>
       </div>
       <div className='additionalInfo'>Temperature</div>
-    </div>
+    </>
   )
 }

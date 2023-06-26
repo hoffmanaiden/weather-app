@@ -31,7 +31,10 @@ export default function App() {
     data: [],
     todaysTemps: [],
     todaysRain: [],
-    todaysWind: []
+    todaysWind: [],
+    todaysCondition: '',
+    todaysChanceOfRain: 0,
+    todaysMaxTemp: 0
   }
 
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -53,10 +56,14 @@ export default function App() {
         rainByHour.push(hour.chance_of_rain)
         windByHour.push(hour.wind_mph)
       }
+      
       return {
         tempByHour: tempByHour,
         rainByHour: rainByHour,
-        windByHour: windByHour
+        windByHour: windByHour,
+        todaysCondition: data.forecast.forecastday[0].day.condition.text,
+        todaysChanceOfRain: data.forecast.forecastday[0].day.daily_chance_of_rain,
+        todaysMaxTemp: data.forecast.forecastday[0].day.maxtemp_f
       }
     }
     async function getWindToday() {
@@ -121,9 +128,9 @@ export default function App() {
       <AppContext.Provider value={providerValue}>
         <div className='homeScreen'>
           <div className='homeSection highlights'>
-            <div>one</div>
-            <div>two</div>
-            <div>three</div>
+            <p>{state.todaysCondition}</p>
+            <p>{state.todaysChanceOfRain}% chance of rain</p>
+            <p>high of {state.todaysMaxTemp}°F</p>
           </div>
           <div className='homeSection temp'>
             <Temp/>
@@ -135,7 +142,6 @@ export default function App() {
             <Wind/>
           </div>
         </div>
-
       </AppContext.Provider>
     </main>
   )

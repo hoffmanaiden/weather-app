@@ -42,7 +42,7 @@ export default function Wind() {
   }, [state.todaysWind])
 
   return (
-    <div>
+    <>
       <div className='sectionIcon'>💨</div>
       <div className='graphContainer'>
         <svg ref={graphLineRef}>
@@ -51,6 +51,6 @@ export default function Wind() {
         </svg>
       </div>
       <div className='additionalInfo'>Wind</div>
-    </div>
+    </>
   )
 }

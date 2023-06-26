@@ -46,7 +46,7 @@ export default function Precipitation() {
   }, [state.todaysRain])
 
   return (
-    <div>
+    <>
       <div className='sectionIcon'>💧</div>
       <div className='graphContainer'>
         <svg ref={graphLineRef}>
@@ -55,6 +55,6 @@ export default function Precipitation() {
         </svg>
       </div>
       <div className='additionalInfo'>Precipitation</div>
-    </div>
+    </>
   )
 }

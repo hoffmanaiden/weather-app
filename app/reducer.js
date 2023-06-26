@@ -15,7 +15,10 @@ export default function reducer(state, action){
         ...state,
         todaysTemps: action.value.tempByHour,
         todaysRain: action.value.rainByHour,
-        todaysWind: action.value.windByHour
+        todaysWind: action.value.windByHour,
+        todaysCondition: action.value.todaysCondition,
+        todaysChanceOfRain: action.value.todaysChanceOfRain,
+        todaysMaxTemp: action.value.todaysMaxTemp
       }
     default:
       break

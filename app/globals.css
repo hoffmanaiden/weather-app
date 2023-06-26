@@ -28,6 +28,7 @@ svg{
 .sectionIcon{
   /* fixed, to make icon float on top of chart */
   position: fixed;
+  font-size: 24px;
 }
 .graphContainer{
   padding-bottom: 20px;
@@ -35,6 +36,7 @@ svg{
 }
 .highlights{
   background: #C9DBBA;
+  flex-direction: column;
 }
 
 .temp{

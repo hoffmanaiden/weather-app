@@ -10,6 +10,13 @@ export default function reducer(state, action){
         ...state,
         data: []
       }
+    case 'tempSetData':
+      return {
+        ...state,
+        todaysTemps: action.value.tempByHour,
+        todaysRain: action.value.rainByHour,
+        todaysWind: action.value.windByHour
+      }
     default:
       break
   }

@@ -17,9 +17,21 @@ svg{
 .homeScreen{
   height: 100vh;
   width: 100vw;
+
 }
 .homeSection{
   height: 25cqh;
+  width: 100cqw;
+  display: flex;
+  flex-direction: row;
+}
+.sectionIcon{
+  /* fixed, to make icon float on top of chart */
+  position: fixed;
+}
+.graphContainer{
+  padding-bottom: 20px;
+  padding-right: 0px;
 }
 .highlights{
   background: #C9DBBA;

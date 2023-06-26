@@ -28,7 +28,10 @@ export default function App() {
     brwsrWidth: width,
     leftMargin: 50,
     bottomMargin: 50,
-    data: [0]
+    data: [],
+    todaysTemps: [],
+    todaysRain: [],
+    todaysWind: []
   }
 
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -39,12 +42,30 @@ export default function App() {
 
   // getting data & setting state on top level
   useEffect(() => {
-    async function getWindToday() {
+    async function getNeededWeatherData(){
+      const tempByHour = []
+      const rainByHour = []
       const windByHour = []
       const data = await getWeatherData()
       const hours = data.forecast.forecastday[0].hour
+      for (let hour of hours){
+        tempByHour.push(hour.temp_f)
+        rainByHour.push(hour.chance_of_rain)
+        windByHour.push(hour.wind_mph)
+      }
+      return {
+        tempByHour: tempByHour,
+        rainByHour: rainByHour,
+        windByHour: windByHour
+      }
+    }
+    async function getWindToday() {
+      const windByHour = []
+      const data = await getWeatherData()
+      console.log(data)
+      const hours = data.forecast.forecastday[0].hour
       for (let hour of hours) {
-        console.log(hour.time + ': ' + hour.wind_mph)
+        // console.log(hour.time + ': ' + hour.wind_mph)
         windByHour.push(hour.wind_mph)
       }
       return windByHour
@@ -52,6 +73,9 @@ export default function App() {
     getWindToday().then((res) => {
       // console.log(res)
       dispatch({ type: 'setData', value: res })
+    })
+    getNeededWeatherData().then((res) => {
+      dispatch({ type: 'tempSetData', value: res})
     })
   }, [])
 
@@ -97,6 +121,9 @@ export default function App() {
       <AppContext.Provider value={providerValue}>
         <div className='homeScreen'>
           <div className='homeSection highlights'>
+            <div>one</div>
+            <div>two</div>
+            <div>three</div>
           </div>
           <div className='homeSection temp'>
             <Temp/>
@@ -105,10 +132,7 @@ export default function App() {
             <Precipitation/>
           </div>
           <div className='homeSection wind'>
-            <svg ref={lineRef}>
-              <g className="x-axis" />
-              <g className="y-axis" />
-            </svg>
+            <Wind/>
           </div>
         </div>
 

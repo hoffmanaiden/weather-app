@@ -21,6 +21,8 @@ export const AppContext = createContext(null)
 // https://github.com/muratkemaldar/using-react-hooks-with-d3/tree/02-curved-line-chart
 // video 3
 
+// something minor
+
 export default function App() {
   const { width, height } = useWindowSize();
   const initialState = {

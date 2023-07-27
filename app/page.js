@@ -52,6 +52,7 @@ export default function App() {
       const rainByHour = []
       const windByHour = []
       const data = await getWeatherData()
+      console.log(data)
       const hours = data.forecast.forecastday[0].hour
       for (let hour of hours){
         tempByHour.push(hour.temp_f)
